@@ -1,7 +1,12 @@
 package com.capybarainc.BookStore.Services;
 
+import com.capybarainc.BookStore.DTO.TransactionDTO;
+import com.capybarainc.BookStore.DTO.TransactionElementDTO;
+import com.capybarainc.BookStore.DTO.UserDTO;
 import com.capybarainc.BookStore.Models.Category;
+import com.capybarainc.BookStore.Models.Transaction;
 import com.capybarainc.BookStore.Models.TransactionElement;
+import com.capybarainc.BookStore.Models.User;
 import com.capybarainc.BookStore.Repositories.TransactionElementRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,5 +31,13 @@ public class TransactionElementService {
         TransactionElement transactionElement = transactionElementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         JsonNode patched = jsonPatch.apply(objectMapper.convertValue(transactionElement, JsonNode.class));
         return transactionElementRepository.save(objectMapper.treeToValue(patched, TransactionElement.class));
+    }
+
+    public TransactionElementDTO mapToTransactionElementDTO(TransactionElement transactionElement) {
+        return objectMapper.convertValue(transactionElement, TransactionElementDTO.class);
+    }
+
+    public TransactionElement mapToTransactionElemrnt(TransactionElementDTO transactionElementDTO) {
+        return objectMapper.convertValue(transactionElementDTO, TransactionElement.class);
     }
 }

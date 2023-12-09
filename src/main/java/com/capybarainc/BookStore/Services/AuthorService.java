@@ -1,5 +1,8 @@
 package com.capybarainc.BookStore.Services;
 
+import com.capybarainc.BookStore.DTO.AuthorDTO;
+import com.capybarainc.BookStore.DTO.AuthorDTO;
+import com.capybarainc.BookStore.Models.Author;
 import com.capybarainc.BookStore.Models.Author;
 import com.capybarainc.BookStore.Repositories.AuthorRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,5 +28,13 @@ public class AuthorService {
         Author author = authorRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         JsonNode patched = jsonPatch.apply(objectMapper.convertValue(author, JsonNode.class));
         return authorRepository.save(objectMapper.treeToValue(patched, Author.class));
+    }
+
+    public AuthorDTO mapToAuthorDTO(Author author) {
+        return objectMapper.convertValue(author, AuthorDTO.class);
+    }
+
+    public Author mapToTransactionElemrnt(AuthorDTO authorDTO) {
+        return objectMapper.convertValue(authorDTO, Author.class);
     }
 }

@@ -2,6 +2,7 @@ package com.capybarainc.BookStore.Controllers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.capybarainc.BookStore.DTO.UserDTO;
 import com.capybarainc.BookStore.Models.User;
 import com.capybarainc.BookStore.Repositories.UserRepository;
 import com.capybarainc.BookStore.Services.UserService;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import jakarta.servlet.http.HttpServletResponse;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("user")
@@ -30,35 +33,39 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping("/")
-    public List<User> Get() {
-        return userRepository.findAll();
+    public List<UserDTO> Get() {
+        return userRepository.findAll().stream()
+                .map(userService::mapToUserDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public User GetOne(@PathVariable long id) {
-        Optional<User> User = userRepository.findById(id);
-        if(!User.isPresent()) throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "entity not found"
+    public UserDTO GetOne(@PathVariable long id) {
+        Optional<UserDTO> userDTO = userRepository.findById(id).map(userService::mapToUserDTO);
+        return userDTO.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found")
         );
-        return User.get();
     }
 
     @PostMapping("")
-    public User Post(@RequestBody User User) {
-        userRepository.save(User);
-        return User;
+    public UserDTO Post(@RequestBody UserDTO userDTO) {
+        UserDTO savedUserDTO = userService.mapToUserDTO(userRepository.save(userService.mapToUser(userDTO)));
+        return savedUserDTO;
     }
 
     @PutMapping("/{id}")
-    public User Put(@PathVariable("id") Long id, @RequestBody User User) {
-        if(userRepository.findById(id).isPresent()) {
-            User.setId(id);
-            userRepository.save(User);
-            return User;
+    public UserDTO Put(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
+        if (userRepository.findById(id).isPresent()) {
+            userDTO.setId(id);
+            UserDTO updatedUserDTO = userService.mapToUserDTO(userRepository.save(userService.mapToUser(userDTO)));
+            return updatedUserDTO;
         } else {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "entity not found"
+                    HttpStatus.NOT_FOUND, "Entity not found"
             );
         }
     }
@@ -97,15 +104,16 @@ public class UserController {
             byte[] hashedPassword = md.digest(password.getBytes(StandardCharsets.UTF_8));
             User user = User.builder().login(login).email(email).password(new String(Base64.getEncoder().encode(hashedPassword))).salt(new String(Base64.getEncoder().encode(salt))).build();
             userRepository.save(user);
-            Algorithm algorithm = Algorithm.HMAC256("test");
+            Algorithm algorithm = userService.GetAlgorithm();
             String jwtToken = JWT.create()
-                    .withIssuer("BookStore")
+                    .withIssuer(UserService.ISSUER)
                     .withSubject("User detail")
                     .withClaim("login", login)
                     .withIssuedAt(new Date())
                     .withExpiresAt(new Date(System.currentTimeMillis() + 5000L))
                     .withJWTId(UUID.randomUUID().toString())
                     .withNotBefore(new Date(System.currentTimeMillis() + 1000L))
+                    .withClaim("role", "user")
                     .sign(algorithm);
             return jwtToken;
         } catch (Exception e) {
@@ -128,9 +136,9 @@ public class UserController {
                                 Base64.getDecoder().decode(users.get(0).getPassword().getBytes(StandardCharsets.UTF_8))
                         )
                 ) {
-                    Algorithm algorithm = Algorithm.HMAC256("test");
+                    Algorithm algorithm = userService.GetAlgorithm();
                     String jwtToken = JWT.create()
-                        .withIssuer("BookStore")
+                        .withIssuer(UserService.ISSUER)
                         .withSubject("User detail")
                         .withClaim("login", login)
                         .withIssuedAt(new Date())

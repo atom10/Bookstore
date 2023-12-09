@@ -1,5 +1,6 @@
 package com.capybarainc.BookStore.Models;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,17 +21,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length=63, nullable=false, unique=true)
+    @Nonnull
+    @Column(nullable=false, unique=true)
     private String login;
 
-    @Column(length=127, nullable=false, unique=true)
+    @Nonnull
+    @Column(nullable=false, unique=true)
     private String email;
 
-    @Column(length=511, nullable=false)
+    @Nonnull
+    @Column(nullable=false)
     private String password;
 
     @OneToMany
-    private List<Book> favouriteAuthors;
+    private List<Author> favouriteAuthors;
 
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;

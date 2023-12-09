@@ -1,7 +1,10 @@
 package com.capybarainc.BookStore.Services;
 
+import com.capybarainc.BookStore.DTO.CategoryDTO;
+import com.capybarainc.BookStore.DTO.TransactionElementDTO;
 import com.capybarainc.BookStore.Models.Book;
 import com.capybarainc.BookStore.Models.Category;
+import com.capybarainc.BookStore.Models.TransactionElement;
 import com.capybarainc.BookStore.Repositories.CategoryRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,4 +30,11 @@ public class CategoryService {
         JsonNode patched = jsonPatch.apply(objectMapper.convertValue(category, JsonNode.class));
         return categoryRepository.save(objectMapper.treeToValue(patched, Category.class));
     }
-}
+
+    public CategoryDTO mapToCategoryDTO(Category category) {
+        return objectMapper.convertValue(category, CategoryDTO.class);
+    }
+
+    public Category mapToTransactionElemrnt(CategoryDTO categoryDTO) {
+        return objectMapper.convertValue(categoryDTO, Category.class);
+    }}
