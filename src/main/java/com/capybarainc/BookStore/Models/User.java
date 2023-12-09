@@ -1,6 +1,5 @@
 package com.capybarainc.BookStore.Models;
 
-// Importing required classes
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,28 +12,32 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "Books")
+@Table(name = "Users")
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Book {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Nonnull
-    private String title;
+    @Column(nullable=false, unique=true)
+    private String login;
 
     @Nonnull
-    @ManyToOne
-    @JoinColumn(name = "author", referencedColumnName = "id")
-    private Author author;
+    @Column(nullable=false, unique=true)
+    private String email;
 
     @Nonnull
-    @Column(columnDefinition = "DATE")
-    private LocalDate releaseDate;
+    @Column(nullable=false)
+    private String password;
 
     @OneToMany
-    private List<Category> categories;
-    private Float price = 0f;
+    private List<Author> favouriteAuthors;
+
+    @Column(columnDefinition = "DATE")
+    private LocalDate birthDate;
+
+    private String salt;
 }
