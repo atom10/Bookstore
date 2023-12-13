@@ -34,3 +34,5 @@ build/
 
 ### database ###
 /database/*
+/testdb.mv.db
+/testdb.trace.db
