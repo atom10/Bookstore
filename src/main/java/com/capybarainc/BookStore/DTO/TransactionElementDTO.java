@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionElementDTO {
-
     private Long id;
     private Integer quantity;
-    private BookDTO book;
+    private long bookId;
 
 }

@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 @Entity
 @Data
 @Table(name = "Authors")
@@ -16,13 +18,13 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String displayedName;
 
-    public Author(String firstName, String lastName, String displayedName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Author(String firstname, String lastname, String displayedName) {
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.displayedName = displayedName;
     }
 }

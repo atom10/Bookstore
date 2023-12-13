@@ -73,13 +73,14 @@ public class BookController {
     }
 
     @GetMapping("/createplaceholders")
-    public void CreatePlaceholders(HttpServletResponse response) {
+    public String CreatePlaceholders(HttpServletResponse response) {
         try {
             bookService.CreatePlaceholders(5);
         } catch (Exception e) {
             throw e;
         }
         response.setStatus(200);
+        return "OK";
     }
 
     @DeleteMapping("/{id}")

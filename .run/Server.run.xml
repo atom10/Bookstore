@@ -2,7 +2,7 @@
   <configuration default="false" name="Server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="com.capybarainc.BookStore.BookStoreApplication" />
     <module name="BookStore" />
-    <option name="VM_PARAMETERS" value="-Dspring.profiles.active=dev" />
+    <option name="VM_PARAMETERS" value="-Dspring.profiles.active=dev -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

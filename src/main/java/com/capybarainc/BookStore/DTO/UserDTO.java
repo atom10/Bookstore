@@ -18,7 +18,7 @@ public class UserDTO {
     private String login;
     private String email;
     //private String password;
-    private List<AuthorDTO> favouriteAuthors;
+    private List<Long> favouriteAuthorsIds;
     private LocalDate birthDate;
     //private String salt;
 

@@ -1,5 +1,7 @@
 package com.capybarainc.BookStore.DTO;
 
+import com.capybarainc.BookStore.Models.TransactionElement;
+import com.capybarainc.BookStore.Models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionDTO {
-
     private Long id;
-    private List<TransactionElementDTO> transactionElements;
+    private List<TransactionElement> transactionElements;
     private Float price = 0f;
-    private Float paid = 0f;
-    private Boolean completed = false;
-
+    private Long userId;
 }

@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 @Entity
 @Data
 @Table(name = "Books")
@@ -27,7 +29,7 @@ public class Book {
 
     @Nonnull
     @ManyToOne
-    @JoinColumn(name = "author", referencedColumnName = "id")
+    //@JoinColumn(name = "author", referencedColumnName = "id")
     private Author author;
 
     @Nonnull

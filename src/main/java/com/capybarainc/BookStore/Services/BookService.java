@@ -41,9 +41,9 @@ public class BookService {
 
         List<Author> authors = new ArrayList<>();
         authors.addAll(Arrays.asList(
-                Author.builder().firstName("Jan").lastName("Brzytwa").displayedName("Jan Brzytwa").build(),
-                Author.builder().firstName("Jędzrzej").lastName("Sapiący").displayedName("Jędzrzej Sapiący").build(),
-                Author.builder().firstName("Stefan").lastName("Kink").displayedName("Stefan Kink").build()
+                Author.builder().firstname("Jan").lastname("Brzytwa").displayedName("Jan Brzytwa").build(),
+                Author.builder().firstname("Jędzrzej").lastname("Sapiący").displayedName("Jędzrzej Sapiący").build(),
+                Author.builder().firstname("Stefan").lastname("Kink").displayedName("Stefan Kink").build()
         ));
         authorRepository.saveAll(authors);
 

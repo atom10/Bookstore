@@ -110,9 +110,8 @@ public class UserController {
                     .withSubject("User detail")
                     .withClaim("login", login)
                     .withIssuedAt(new Date())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 5000L))
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 500000L))
                     .withJWTId(UUID.randomUUID().toString())
-                    .withNotBefore(new Date(System.currentTimeMillis() + 1000L))
                     .withClaim("role", "user")
                     .sign(algorithm);
             return jwtToken;
@@ -142,9 +141,8 @@ public class UserController {
                         .withSubject("User detail")
                         .withClaim("login", login)
                         .withIssuedAt(new Date())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 5000L))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 500000L))
                         .withJWTId(UUID.randomUUID().toString())
-                        .withNotBefore(new Date(System.currentTimeMillis() + 1000L))
                         .sign(algorithm);
                     return jwtToken;
                 } else {
