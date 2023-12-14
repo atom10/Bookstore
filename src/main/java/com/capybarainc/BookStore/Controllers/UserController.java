@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -88,11 +89,11 @@ public class UserController {
         response.setStatus(204);
     }
 
-    @PostMapping(value="register")
-    public String Register(@RequestBody MultiValueMap<String, String> formData) {
-        String login = formData.get("login").getFirst();
-        String email = formData.get("email").getFirst();;
-        String password = formData.get("password").getFirst();;
+    @PostMapping(value="register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> Register(@RequestBody Map<String, String> formData) {
+        String login = formData.get("login");
+        String email = formData.get("email");
+        String password = formData.get("password");
         try {
             if(!userRepository.findByLogin(login).isEmpty()) throw new Exception("Login already exists");
             if(!userRepository.findByEmail(email).isEmpty()) throw new Exception("Email already exists");
@@ -114,21 +115,21 @@ public class UserController {
                     .withJWTId(UUID.randomUUID().toString())
                     .withClaim("role", "user")
                     .sign(algorithm);
-            return jwtToken;
+            return ResponseEntity.ok("{\"token\":\""+jwtToken+"\"}");
         } catch (Exception e) {
-            return e.toString();
+            return ResponseEntity.ok(e.toString());
         }
     }
 
-    @GetMapping("login")
-    public String Login(String login, String password) {
+    @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> Login(@RequestBody Map<String, String> formData) {
         try {
-            List<User> users = userRepository.findByLogin(login);
+            List<User> users = userRepository.findByLogin(formData.get("login"));
             if (!users.isEmpty()) {
                 byte[] salt = Base64.getDecoder().decode(users.get(0).getSalt().getBytes("utf-8"));
                 MessageDigest md = MessageDigest.getInstance("SHA-512");
                 md.update(salt);
-                byte[] hashedPassword = md.digest(password.getBytes(StandardCharsets.UTF_8));
+                byte[] hashedPassword = md.digest(formData.get("password").getBytes(StandardCharsets.UTF_8));
                 if(
                         Arrays.equals(
                                 hashedPassword,
@@ -139,20 +140,20 @@ public class UserController {
                     String jwtToken = JWT.create()
                         .withIssuer(UserService.ISSUER)
                         .withSubject("User detail")
-                        .withClaim("login", login)
+                        .withClaim("login", formData.get("login"))
                         .withIssuedAt(new Date())
                         .withExpiresAt(new Date(System.currentTimeMillis() + 500000L))
                         .withJWTId(UUID.randomUUID().toString())
                         .sign(algorithm);
-                    return jwtToken;
+                    return ResponseEntity.ok("{\"token\":\""+jwtToken+"\"}");
                 } else {
-                    return "Wrong password";
+                    return ResponseEntity.ok("Wrong password");
                 }
             } else {
-                return "User with giver login doesn't exist";
+                return ResponseEntity.ok("User with giver login doesn't exist");
             }
         } catch (Exception e) {
-            return e.toString();
+            return ResponseEntity.ok(e.toString());
         }
     }
 }
