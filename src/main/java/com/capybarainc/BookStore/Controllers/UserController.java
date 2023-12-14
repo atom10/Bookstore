@@ -20,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("user")
 public class UserController {
+    public final byte[] PEPPER = "pepper".getBytes("utf-8");
     @Autowired
     UserService userService;
     @Autowired
@@ -40,6 +42,10 @@ public class UserController {
 
     @Autowired
     Verify verify;
+
+    public UserController() throws UnsupportedEncodingException {
+    }
+
     @GetMapping("/")
     public List<UserDTO> Get(@RequestHeader("Authorization") String bearerToken) {
         if(verify.VerifyTokenWithClaim(bearerToken.replace("Bearer ",""), "Role", "Admin")) return new ArrayList<>();
@@ -105,7 +111,10 @@ public class UserController {
             byte[] salt = new byte[16];
             random.nextBytes(salt);
             MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(salt);
+            byte[] combined = new byte[salt.length + PEPPER.length];
+            System.arraycopy(salt,0,combined,0         ,salt.length);
+            System.arraycopy(PEPPER,0,combined,salt.length,PEPPER.length);
+            md.update(combined);
             byte[] hashedPassword = md.digest(password.getBytes(StandardCharsets.UTF_8));
             User user = User.builder().login(login).email(email).password(new String(Base64.getEncoder().encode(hashedPassword))).salt(new String(Base64.getEncoder().encode(salt))).build();
             userRepository.save(user);
@@ -132,7 +141,10 @@ public class UserController {
             if (!users.isEmpty()) {
                 byte[] salt = Base64.getDecoder().decode(users.get(0).getSalt().getBytes("utf-8"));
                 MessageDigest md = MessageDigest.getInstance("SHA-512");
-                md.update(salt);
+                byte[] combined = new byte[salt.length + PEPPER.length];
+                System.arraycopy(salt,0,combined,0         ,salt.length);
+                System.arraycopy(PEPPER,0,combined,salt.length,PEPPER.length);
+                md.update(combined);
                 byte[] hashedPassword = md.digest(formData.get("password").getBytes(StandardCharsets.UTF_8));
                 if(
                         Arrays.equals(

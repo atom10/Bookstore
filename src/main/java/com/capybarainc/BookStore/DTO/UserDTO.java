@@ -13,13 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-
     private Long id;
     private String login;
     private String email;
-    //private String password;
     private List<Long> favouriteAuthorsIds;
     private LocalDate birthDate;
-    //private String salt;
-
 }
