@@ -40,7 +40,8 @@ public class TransactionController {
     Verify verify;
 
     @GetMapping("/")
-    public List<Transaction> Get() {
+    public List<Transaction> Get(@RequestHeader("Authorization") String bearerToken) {
+        if(verify.VerifyTokenWithClaim(bearerToken.replace("Bearer ",""), "Role", "Admin")) return new ArrayList<>();
         return transactionRepository.findAll();
     }
 

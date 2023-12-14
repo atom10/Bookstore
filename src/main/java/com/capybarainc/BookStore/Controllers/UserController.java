@@ -3,6 +3,7 @@ package com.capybarainc.BookStore.Controllers;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.capybarainc.BookStore.DTO.UserDTO;
+import com.capybarainc.BookStore.Methods.Verify;
 import com.capybarainc.BookStore.Models.User;
 import com.capybarainc.BookStore.Repositories.UserRepository;
 import com.capybarainc.BookStore.Services.UserService;
@@ -37,8 +38,11 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    Verify verify;
     @GetMapping("/")
-    public List<UserDTO> Get() {
+    public List<UserDTO> Get(@RequestHeader("Authorization") String bearerToken) {
+        if(verify.VerifyTokenWithClaim(bearerToken.replace("Bearer ",""), "Role", "Admin")) return new ArrayList<>();
         return userRepository.findAll().stream()
                 .map(userService::mapToUserDTO)
                 .collect(Collectors.toList());

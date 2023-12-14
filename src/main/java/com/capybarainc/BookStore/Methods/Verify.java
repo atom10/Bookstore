@@ -26,6 +26,17 @@ public class Verify {
         return true;
     }
 
+    public boolean VerifyTokenWithClaim(String token, String claim, String expectedValue) {
+        JWTVerifier verifier = userService.GetVerifier();
+        try {
+            DecodedJWT decodedJWT = verifier.verify(token);
+            return decodedJWT.getClaim(claim).asString().equals(expectedValue);
+        } catch (JWTVerificationException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
     public String GetLogin(String token) {
         JWTVerifier verifier = userService.GetVerifier();
         try {
