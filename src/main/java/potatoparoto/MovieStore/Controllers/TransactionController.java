@@ -114,7 +114,7 @@ public class TransactionController {
         List<TransactionElement> transactionElements = transaction.getTransactionElements();
         transactionElements.add(transactionElement);
         transaction.setTransactionElements(transactionElements);
-        transaction.setPrice(transaction.getPrice() + movieRepository.getById(Long.parseLong(formData.get("movieId"))).getPrice() * Integer.parseInt(formData.get("quantity")));
+        transaction.setPrice(transaction.getPrice() + movieRepository.getById(Long.parseLong(formData.get("movieId"))).getPrice() * (float)Integer.parseInt(formData.get("quantity")));
         transactionRepository.save(transaction);
         return transaction;
     }

@@ -29,4 +29,9 @@ public class Transaction {
     @Nonnull
     @ManyToOne
     private User user;
+
+    public Float getPrice() {
+        if(price == null) return 0f;
+        else return price;
+    }
 }

@@ -34,4 +34,9 @@ public class Movie {
     @OneToMany
     private List<Category> categories;
     private Float price = 0f;
+
+    public Float getPrice() {
+        if(price == null) return 0f;
+        else return price;
+    }
 }
