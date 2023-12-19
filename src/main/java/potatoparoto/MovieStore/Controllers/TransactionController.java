@@ -40,7 +40,8 @@ public class TransactionController {
     @GetMapping("/")
     public List<Transaction> Get(@RequestHeader("Authorization") String bearerToken) {
         if(verify.VerifyTokenWithClaim(bearerToken.replace("Bearer ",""), "Role", "Admin")) return new ArrayList<>();
-        return transactionRepository.findAll();
+        User user = userRepository.findByLogin(verify.GetLogin(bearerToken)).getFirst();
+        return transactionRepository.findByUser(user);
     }
 
     @GetMapping("/{id}")

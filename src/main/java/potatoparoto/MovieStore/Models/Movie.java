@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 @Entity
 @Data
-@Table(name = "Books")
+@Table(name = "Movies")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

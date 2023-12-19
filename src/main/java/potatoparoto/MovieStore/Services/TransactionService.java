@@ -2,6 +2,7 @@ package potatoparoto.MovieStore.Services;
 
 import potatoparoto.MovieStore.Models.Transaction;
 import potatoparoto.MovieStore.Models.TransactionElement;
+import potatoparoto.MovieStore.Models.User;
 import potatoparoto.MovieStore.Repositories.TransactionElementRepository;
 import potatoparoto.MovieStore.Repositories.TransactionRepository;
 import potatoparoto.MovieStore.Repositories.UserRepository;
@@ -49,4 +50,8 @@ public class TransactionService {
                 .map(transactionElementRepository::getById)
                 .collect(Collectors.toList());
     }
+
+    /*public List<Transaction> GetTransactionsOfUser(User user) {
+
+    }*/
 }
