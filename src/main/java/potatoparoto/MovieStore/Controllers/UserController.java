@@ -117,7 +117,7 @@ public class UserController {
                     .withSubject("User detail")
                     .withClaim("login", login)
                     .withIssuedAt(new Date())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 500000L))
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 50000000L))
                     .withJWTId(UUID.randomUUID().toString())
                     .withClaim("role", "user")
                     .sign(algorithm);
@@ -151,7 +151,7 @@ public class UserController {
                         .withSubject("User detail")
                         .withClaim("login", formData.get("login"))
                         .withIssuedAt(new Date())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 500000L))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 50000000L))
                         .withJWTId(UUID.randomUUID().toString())
                         .sign(algorithm);
                     return ResponseEntity.ok("{\"token\":\""+jwtToken+"\"}");

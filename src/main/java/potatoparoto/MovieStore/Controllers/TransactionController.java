@@ -1,5 +1,6 @@
 package potatoparoto.MovieStore.Controllers;
 
+import org.springframework.http.MediaType;
 import potatoparoto.MovieStore.Methods.Verify;
 import potatoparoto.MovieStore.Models.Transaction;
 import potatoparoto.MovieStore.Models.TransactionElement;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -39,8 +41,7 @@ public class TransactionController {
 
     @GetMapping("/")
     public List<Transaction> Get(@RequestHeader("Authorization") String bearerToken) {
-        if(verify.VerifyTokenWithClaim(bearerToken.replace("Bearer ",""), "Role", "Admin")) return new ArrayList<>();
-        User user = userRepository.findByLogin(verify.GetLogin(bearerToken)).getFirst();
+        User user = userRepository.findByLogin(verify.GetLogin(bearerToken.replace("Bearer ",""))).getFirst();
         return transactionRepository.findByUser(user);
     }
 
@@ -101,31 +102,32 @@ public class TransactionController {
         return transaction;
     }
 
-    @PostMapping("/addtotransaction")
-    public Transaction AddBookToTransaction(Long bookId, Long quantity, @RequestHeader("Authorization") String bearerToken) {
+    @PostMapping(value = "/addtotransaction", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Transaction AddBookToTransaction(@RequestBody Map<String, String> formData, @RequestHeader("Authorization") String bearerToken) {
         String login = verify.GetLogin(bearerToken.replace("Bearer ",""));
         User user = userRepository.findByLogin(login).get(0);
         List<Transaction> transactions = transactionRepository.findByUser(user);
-        TransactionElement transactionElement = TransactionElement.builder().movie(movieRepository.getById(bookId)).quantity(quantity.intValue()).build();
+        TransactionElement transactionElement = TransactionElement.builder().movie(movieRepository.getById(Long.parseLong(formData.get("movieId")))).quantity(Integer.parseInt(formData.get("quantity"))).build();
         transactionElementRepository.save(transactionElement);
         Optional<Transaction> sessionTransaction = transactions.stream().filter((Transaction t) -> !t.getConfirmed()).findFirst();
         Transaction transaction = sessionTransaction.isPresent() ? sessionTransaction.get() : Transaction.builder().user(user).confirmed(false).transactionElements(new ArrayList<>()).build();
         List<TransactionElement> transactionElements = transaction.getTransactionElements();
         transactionElements.add(transactionElement);
         transaction.setTransactionElements(transactionElements);
+        transaction.setPrice(transaction.getPrice() + movieRepository.getById(Long.parseLong(formData.get("movieId"))).getPrice() * Integer.parseInt(formData.get("quantity")));
         transactionRepository.save(transaction);
         return transaction;
     }
-
-    @PostMapping("/removefromtransaction")
-    public Transaction RemoveFromTransaction(Long transactionElementId, @RequestHeader("Authorization") String bearerToken) {
+    @DeleteMapping(value = "/removefromtransaction", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Transaction RemoveFromTransaction(@RequestBody Map<String, String> formData, @RequestHeader("Authorization") String bearerToken) {
         String login = verify.GetLogin(bearerToken.replace("Bearer ",""));
         User user = userRepository.findByLogin(login).get(0);
         List<Transaction> transactions = transactionRepository.findByUser(user);
         Optional<Transaction> sessionTransaction = transactions.stream().filter((Transaction t) -> !t.getConfirmed()).findFirst();
         Transaction transaction = sessionTransaction.isPresent() ? sessionTransaction.get() : Transaction.builder().user(user).confirmed(false).transactionElements(new ArrayList<>()).build();
         List<TransactionElement> transactionElements = transaction.getTransactionElements();
-        TransactionElement transactionElement = transactionElements.stream().filter((TransactionElement te) -> te.getId() == transactionElementId).findFirst().get();
+        TransactionElement transactionElement = transactionElements.stream().filter((TransactionElement te) -> te.getId() == Long.parseLong(formData.get("transactionElementId"))).findFirst().get();
+        transaction.setPrice(transaction.getPrice() - transactionElement.getQuantity() * transactionElement.getMovie().getPrice());
         transactionElementRepository.delete(transactionElement);
         transactionElements.remove(transactionElement);
         transaction.setTransactionElements(transactionElements);
